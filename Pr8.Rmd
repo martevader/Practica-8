@@ -1,0 +1,175 @@
+---
+title: "Prueba 8"
+author: "Marta Muñoz Liébana"
+date: "2023-03-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+#Ejercicio 1.  Instale y cargue las siguientes librerías: “MASS”, “caret”, “stat”, “olsrr”, “kable”, “kableExtra”, “knitr” y “rmarkdown”. 
+install.packages("MASS")
+library("MASS")
+install.packages("caret")
+library("caret")
+install.packages("STAT")
+library("STAT")
+install.packages("olsrr")
+library("olsrr")
+install.packages("kableExtra")
+library("kableExtra")
+library("knitr")
+library("rmarkdown")
+
+#Ejercicio 2. Cree 2 variables almacenadas como vector: “y_cuentas” y “x_distancia” a partir de los siguientes valores numéricos
+y_cuentas <- c(110,2,6,98,40,94,31,5,8,10)
+x_distancia <- c(1.1,100.2,90.3,5.4,57.5,6.6,34.7,65.8,57.9,86.1)
+
+#Ejercicio 3.Verifique el supuesto de linealidad de la variable explicativa incluyendo un contraste de hipótesis.
+plot(x_distancia, y_cuentas)
+cor(x_distancia, y_cuentas)
+cor.test(x_distancia, y_cuentas)
+
+#Ejercicio 4. Verifique el supuesto de normalidad de la variable explicativa mediante su visualización en un histograma y un test de normalidad.
+hist(x_distancia)
+hist(y_cuentas)
+#Test de normalidad
+shapiro.test(x_distancia)
+shapiro.test(y_cuentas)
+
+#Ejercicio 5. Multiplique las variable de respuesta por la variable explicativa. Llama al objeto “xy”. 
+xy <- x_distancia * y_cuentas
+xy
+
+#Ejercicio 6. Eleve al cuadrado la variable explicativa. Llama al objeto “x_cuadrado”
+x_cuadrado <- x_distancia^2
+x_cuadrado
+
+#Ejercicio 7. A continuación, almacena las variables: “y_cuentas”, “x_distancia”, “xy” y “x_cuadrado” en un data frame llamado “tabla_datos”
+tabla_datos <-data.frame(y_cuentas, x_distancia, xy, x_cuadrado)
+tabla_datos
+
+#Ejercicio.8 Visualice el objeto “tabla_datos” en una tabla en la consola a través de alguna de las funciones ofrecidas por la librería “kableExtra”
+kbl(tabla_datos)
+row_spec(nrow(sumatorio), bold = TRUE, color = "black", background = "white")
+
+#Ejercicio. 9 Realice el sumatorio de los valores almacenados en las 4 columnas del data frame “tabla_datos”
+sumatorio <- y_cuentas + x_distancia + xy + x_cuadrado
+sumatorio
+
+#Ejercicio 10. Añada el sumatorio de las 4 columnas como un último registro en el data frame “tabla_datos” de modo que tengamos en un solo objeto los valores junto con el sumatorio
+sum_columnas <- rbind(tabla_datos, sumatorio)
+
+#Ejercicio. 11 Calcule la recta de regresión por el método de mínimos cuadrados (ordinario) a través de los datos incluidos en el data frame “tabla_datos”
+sumatorio_def <- lm(y_cuentas ~ x_distancia, data = tabla_datos)
+suma_ej11 <- summary(sumatorio_def)
+suma_ej11
+
+#Ejercicio 12. Visualice en un gráfico de dispersión la recta de regresión, nube de puntos. Indique en el título la ecuación resultante y edite los nombre de los ejes
+plot(x_distancia, y_cuentas)
+regresion <- lm(x_distancia ~ y_cuentas, data = tabla_datos)
+summary(regresion)
+abline(regresion)
+
+#Ejercicio 13. .Calcule los residuos, residuos estandarizados y residuos estudentizados del modelo recién ajustado
+#Calcular los residuos
+ej13 <- lm(y_cuentas ~ x_distancia, data = tabla_datos)
+ej13
+residuos <- residuals(ej13)
+residuos
+#Para calcular los residuos estandarizados.
+modelo <- lm(y_cuentas ~ x_distancia, data = tabla_datos) 
+modelo
+residuos_estandarizados <- rstandard(modelo)
+residuos_estandarizados
+#Para calcular los residuos estudentizados.
+modelo <- lm(y_cuentas ~ x_distancia, data = tabla_datos) 
+residuos_estudentizados <- rstudent(modelo)
+residuos_estudentizados
+
+#Ejercicio. 14. Calcula el pronóstico o estimación del modelo para una observación que registra una distancia de 6.6km con respecto a la mina
+
+#Ejercicio. 15. Genera dos conjuntos aleatorios de datos: “entrenamiento” y “validación”.
+entrenamiento <- rnorm(10)
+entrenamiento
+validacion <- rnorm (10)
+validacion
+
+#Ejercicio 16. Ajusta nuevamente el modelo con el conjunto de “entrenamiento”
+data <- data.frame(y_cuentas, x_distancia)
+train_sample <- data %>% 
+  createDataPartition(p = .8, list = FALSE)
+entrenamiento <- data[-train_sample]
+test <- data[train_sample]
+length(entrenamiento)
+
+library(dplyr)
+train <- data %>% dplyr::sample_frac(.8)
+test <- dplyr::anti_join(data, train)
+test
+
+#Ejercicio 17.Interprete el valor asociado a los coeficientes de regresión y a R2. ¿Qué significan los asteriscos inmediatamente a la derecha de los valores arrojados tras ajustar el modelo?
+#Los coeficicientes de regresión nos sirven para intentar predecir los valores de la variable dependiente e independiente
+Se ha de emplear:
+cof_regresion <-function(y_cuentas, x_cuadrado)
+  cof_regresion
+co_regr <- lm(y_cuentas ~ x_cuadrado)
+summary(co_regr)
+
+Si hay 3 asteriscos representa que que el coeficiente de regresión es significativamente diferente de cero al nivel de significación del 99.9%. Los 2 asteriscos representan que el nivel de significación es del 99% y que aparezca un asterisco representa el 95% de significación. 
+
+#Ejercicio 18. ¿Cómo se ha realizado el cálculo para los grados de libertad del modelo?
+Los grados de libertad se refieren al número de valores que pueden variar en un análisis estadístico sin afectar el resultado final. En este caso se puede emplear la función:
+t.test(y_cuentas, x_cuadrado)$df
+
+#Ejercicio 19. Especifique el total de varianza explicada y no explicada por el modelo.
+El total de varianza de un modelo se refiere a la variabilidad total en la variable de respuesta que se puede explicar por el modelo. En este caso tenemos que emplear las funciones:
+pred <- predict(co_regr)
+media <- mean(xy)
+SSR <- sum((pred - media)^2)
+SSE <- sum((xy - pred)^2)
+SST <- SSR + SSE
+R2 <- SSR / SST
+list(SSR = SSR, SSE = SSE, SST = SST, R2 = R2)
+
+#Ejercicio 20. Aplique la validación cruzada simple para evaluar la robustez y capacidad predictiva del modelo
+Se ha de emplear la función:
+val_cruz <- predict(train, data = test)
+
+#Ejercicio 21. Verifique que no existen observaciones influyentes
+Para la verificación se han de emplear los siguientes comandos:
+observaciones <- influence.measures(sumatorio_def)
+observaciones$cook
+observaciones$hat
+observaciones$studentized.residuals
+
+#Ejercicio 22. Verifique el supuesto de independencia de los residuos. 
+Para comprobar el supuesto de independencia se ha de realizar:
+residuos <- residuals(sumatorio_def)
+plot(sumatorio_def$fitted.values, residuos, xlab = "Valores ajustados", ylab = "Residuos") 
+
+#Ejercicio 23. Confirme que los errores del modelo permanecen constantes para todo el rango de estimaciones.
+Para confirmar que los errores del modelo siguen constantes se han de emplear los siguientes comandos:
+plot(recreg$fitted.values, resiestan, xlab = "Valores ajustados", ylab = "Residuos estandarizados")
